@@ -1,13 +1,16 @@
 import { Button } from "@/components/ui/button";
-import type { IBook } from "@/interface/book.interface";
-import { useGetAllBooksQuery } from "@/redux/baseApi/baseApi";
+import { useGetSingleBookQuery } from "@/redux/baseApi/baseApi";
 import { Link, useParams } from "react-router";
 
 const DetailsBook = () => {
   const { id } = useParams();
-  const { data, isLoading, isError } = useGetAllBooksQuery(undefined);
+  const { data, isLoading, isError } = useGetSingleBookQuery(id, {
+    refetchOnFocus: true,
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true,
+  });
 
-  const book = data?.data?.find((b: IBook) => b._id === id);
+  const book = data?.book;
 
   if (isLoading) {
     return (
@@ -16,11 +19,18 @@ const DetailsBook = () => {
   }
 
   if (isError || !book) {
-    return <p className="p-6 text-center text-red-500">Book not found.</p>;
+    return (
+      <div className="flex flex-col justify-center items-center">
+        <p className="p-6 text-center text-red-500">Book not found.</p>
+        <Link to={"/books"}>
+          <Button>Go Back!</Button>
+        </Link>
+      </div>
+    );
   }
 
   return (
-    <div className="p-6 bg-white rounded-lg text-center flex flex-col gap-2">
+    <div className="p-6 bg-white rounded-lg text-center flex flex-col gap-2 shadow-lg">
       <h1 className="text-2xl font-semibold mb-4">{book.title}</h1>
       <p>
         <strong>Author:</strong> {book.author}

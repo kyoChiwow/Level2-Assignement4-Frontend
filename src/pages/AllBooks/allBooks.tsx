@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -8,10 +9,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetAllBooksQuery } from "@/redux/baseApi/baseApi";
+import { useState } from "react";
 import { Link } from "react-router";
 
 const AllBooks = () => {
-  const { data, isLoading, isError } = useGetAllBooksQuery(undefined, {
+    const [page, setPage] = useState(1);
+
+  const { data, isLoading, isError } = useGetAllBooksQuery({ page: 1, limit: 10 }, {
     pollingInterval: 5000,
     refetchOnFocus: true,
     refetchOnMountOrArgChange: true,
@@ -19,6 +23,7 @@ const AllBooks = () => {
   });
 
   const allBooks = data?.data;
+  const totalPages = data?.meta?.totalPages || 1;
 
   const tableHeader = [
     { id: "title", title: "Title" },
@@ -47,7 +52,7 @@ const AllBooks = () => {
   }
 
   return (
-    <div className="p-6 bg-white rounded-lg">
+    <div className="p-6 bg-white rounded-lg shadow-lg">
       <h1 className="text-2xl font-semibold mb-4">All Books</h1>
 
       <Table>
@@ -72,7 +77,9 @@ const AllBooks = () => {
                 <Link className="border" to={`/books/${book._id}`}>
                   <Button variant={"outline"}>Details</Button>
                 </Link>
-                <Button variant={"outline"}>Edit Book</Button>
+                <Link className="border" to={`/edit-book/${book._id}`}>
+                  <Button variant={"outline"}>Edit Book</Button>
+                </Link>
                 <Button variant={"outline"}>Delete Book</Button>
                 <Button variant={"outline"}>Borrow Book</Button>
               </TableCell>
@@ -80,6 +87,35 @@ const AllBooks = () => {
           ))}
         </TableBody>
       </Table>
+
+      <Pagination className="mt-6">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              className={page === 1 ? "pointer-events-none opacity-50" : ""}
+            />
+          </PaginationItem>
+
+          {Array.from({ length: totalPages }, (_, i) => (
+            <PaginationItem key={i}>
+              <PaginationLink
+                isActive={page === i + 1}
+                onClick={() => setPage(i + 1)}
+              >
+                {i + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+
+          <PaginationItem>
+            <PaginationNext
+              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+              className={page === totalPages ? "pointer-events-none opacity-50" : ""}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 };
