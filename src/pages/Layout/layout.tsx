@@ -3,7 +3,7 @@ import { Outlet } from "react-router";
 
 export default function Layout() {
   return (
-    <div>
+    <div className="bg-gray-100 min-h-screen">
       {/* Navbar Here */}
       <div>
         <Navbar />

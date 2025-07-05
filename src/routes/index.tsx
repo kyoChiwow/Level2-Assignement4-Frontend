@@ -1,3 +1,4 @@
+import DetailsBook from "@/module/Book/detailsBook";
 import AddBook from "@/pages/AddBook/addBook";
 import AllBooks from "@/pages/AllBooks/allBooks";
 import BorrowSummary from "@/pages/BorrowSummary/borrowSummary";
@@ -20,7 +21,11 @@ const router = createBrowserRouter([
             {
                 path: '/borrow-summary',
                 Component: BorrowSummary,
-            }
+            },
+            {
+                path: '/books/:id',
+                Component: DetailsBook,
+            },
         ]
     }
 ])
