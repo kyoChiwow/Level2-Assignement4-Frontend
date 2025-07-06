@@ -1,5 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -8,19 +23,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetAllBooksQuery } from "@/redux/baseApi/baseApi";
+import {
+  useDeleteBookMutation,
+  useGetAllBooksQuery,
+} from "@/redux/baseApi/baseApi";
 import { useState } from "react";
 import { Link } from "react-router";
+import { toast } from "sonner";
 
 const AllBooks = () => {
-    const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1);
+  const [bookToDelete, setBookToDelete] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
-  const { data, isLoading, isError } = useGetAllBooksQuery({ page, limit: 10, sortBy: "createdAt", sort: "desc" }, {
-    pollingInterval: 5000,
-    refetchOnFocus: true,
-    refetchOnMountOrArgChange: true,
-    refetchOnReconnect: true,
-  });
+  const [deleteBook, { isLoading: isDeleting }] = useDeleteBookMutation();
+  const { data, isLoading, isError } = useGetAllBooksQuery(
+    { page, limit: 10, sortBy: "createdAt", sort: "desc" },
+    {
+      pollingInterval: 5000,
+      refetchOnFocus: true,
+      refetchOnMountOrArgChange: true,
+      refetchOnReconnect: true,
+    }
+  );
 
   const allBooks = data?.data;
   const totalPages = data?.meta?.totalPages || 1;
@@ -35,7 +60,26 @@ const AllBooks = () => {
     { id: "actions", title: "Actions" },
   ];
 
-  console.log({ data, isLoading, isError });
+  const openDialog = (id: string) => {
+    setBookToDelete(id);
+    setOpen(true);
+  };
+  const closeDialog = () => {
+    setOpen(false);
+    setBookToDelete(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!bookToDelete) return;
+    try {
+      await deleteBook(bookToDelete).unwrap();
+      closeDialog();
+      toast.success("Book deleted successfully!");
+    } catch (error) {
+      console.error("Failed to delete book", error);
+      toast.error("Failed to delete book!");
+    }
+  };
 
   if (isLoading) {
     return <p className="p-6 text-center text-gray-500">Loading books...</p>;
@@ -80,7 +124,13 @@ const AllBooks = () => {
                 <Link className="border" to={`/edit-book/${book._id}`}>
                   <Button variant={"outline"}>Edit Book</Button>
                 </Link>
-                <Button variant={"outline"}>Delete Book</Button>
+                <Button
+                  onClick={() => openDialog(book._id)}
+                  disabled={isDeleting}
+                  variant={"outline"}
+                >
+                  Delete Book
+                </Button>
                 <Button variant={"outline"}>Borrow Book</Button>
               </TableCell>
             </TableRow>
@@ -111,11 +161,36 @@ const AllBooks = () => {
           <PaginationItem>
             <PaginationNext
               onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-              className={page === totalPages ? "pointer-events-none opacity-50" : ""}
+              className={
+                page === totalPages ? "pointer-events-none opacity-50" : ""
+              }
             />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this book? This action cannot be
+            undone.
+          </DialogDescription>
+
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
