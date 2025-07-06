@@ -15,7 +15,7 @@ import { Link } from "react-router";
 const AllBooks = () => {
     const [page, setPage] = useState(1);
 
-  const { data, isLoading, isError } = useGetAllBooksQuery({ page: 1, limit: 10 }, {
+  const { data, isLoading, isError } = useGetAllBooksQuery({ page, limit: 10, sortBy: "createdAt", sort: "desc" }, {
     pollingInterval: 5000,
     refetchOnFocus: true,
     refetchOnMountOrArgChange: true,

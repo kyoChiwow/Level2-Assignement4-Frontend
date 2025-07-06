@@ -7,6 +7,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   useGetSingleBookQuery,
   useUpdateBookMutation,
@@ -112,7 +113,19 @@ const EditBook = () => {
               <FormItem>
                 <FormLabel>Book Genre</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a genre" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="FICTION">Fiction</SelectItem>
+                      <SelectItem value="NON-FICTION">Non-Fiction</SelectItem>
+                      <SelectItem value="SCIENCE">Science</SelectItem>
+                      <SelectItem value="HISTORY">History</SelectItem>
+                      <SelectItem value="BIOGRAPHY">Biography</SelectItem>
+                      <SelectItem value="FANTASY">Fantasy</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
               </FormItem>
             )}
@@ -141,9 +154,14 @@ const EditBook = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" disabled={isUpdating}>
-            {isUpdating ? "Updating..." : "Update Book"}
-          </Button>
+          <div className="space-x-4">
+            <Button type="submit" disabled={isUpdating}>
+              {isUpdating ? "Updating..." : "Update Book"}
+            </Button>
+            <Link to={"/books"}>
+              <Button>Go Back!</Button>
+            </Link>
+          </div>
         </form>
       </Form>
     </div>

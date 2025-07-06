@@ -12,6 +12,10 @@ const router = createBrowserRouter([
         Component: Layout,
         children: [
             {
+                index: true,
+                Component: AllBooks,
+            },
+            {
                 path: '/books',
                 Component: AllBooks,
             },
