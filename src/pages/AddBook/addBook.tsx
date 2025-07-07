@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useCreateBookMutation } from "@/redux/baseApi/baseApi";
 import { useForm, type FieldValues, type SubmitHandler } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
@@ -66,6 +67,18 @@ const AddBook = () => {
                 <FormLabel>Book Author</FormLabel>
                 <FormControl>
                   <Input {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Book Description</FormLabel>
+                <FormControl>
+                  <Textarea {...field} />
                 </FormControl>
               </FormItem>
             )}
