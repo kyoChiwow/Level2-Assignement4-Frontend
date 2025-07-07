@@ -30,11 +30,14 @@ import {
 import { useState } from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
+import BorrowModal from "../BorrowSummary/borrowModal";
 
 const AllBooks = () => {
   const [page, setPage] = useState(1);
   const [bookToDelete, setBookToDelete] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [borrowOpen, setBorrowOpen] = useState(false);
+  const [borrowBookId, setBorrowBookId] = useState<string | null>(null);
 
   const [deleteBook, { isLoading: isDeleting }] = useDeleteBookMutation();
   const { data, isLoading, isError } = useGetAllBooksQuery(
@@ -131,7 +134,22 @@ const AllBooks = () => {
                 >
                   Delete Book
                 </Button>
-                <Button variant={"outline"}>Borrow Book</Button>
+                <Button
+                  onClick={() => {
+                    setBorrowBookId(book._id);
+                    setBorrowOpen(true);
+                  }}
+                  variant={"outline"}
+                >
+                  Borrow Book
+                </Button>
+                {borrowBookId && (
+                  <BorrowModal
+                    open={borrowOpen}
+                    setOpen={setBorrowOpen}
+                    bookId={borrowBookId}
+                  />
+                )}
               </TableCell>
             </TableRow>
           ))}

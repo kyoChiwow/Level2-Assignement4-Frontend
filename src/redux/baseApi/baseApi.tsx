@@ -35,8 +35,20 @@ export const baseApi = createApi({
                 method: "DELETE",
             }),
             invalidatesTags: ["book"],
+        }),
+        borrowSummary: builder.query({
+            query: () => `/borrow-summary`,
+            providesTags: ["book"],
+        }),
+        borrow: builder.mutation({
+            query: ({ id, body}) => ({
+                url: `/borrow/${id}`,
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: ["book"],
         })
     }),
 })
 
-export const { useGetAllBooksQuery, useGetSingleBookQuery, useUpdateBookMutation, useCreateBookMutation, useDeleteBookMutation } = baseApi;
+export const { useGetAllBooksQuery, useGetSingleBookQuery, useUpdateBookMutation, useCreateBookMutation, useDeleteBookMutation, useBorrowSummaryQuery, useBorrowMutation } = baseApi;
